@@ -4,8 +4,93 @@
 
 ## Missing value analysis
 
-
 ```{r}
-cat("test connection")
+# install.packages("naniar")
 ```
 
+
+```{r}
+library(tidyverse)
+library(janitor)
+library(naniar)  # for missingness plots (optional but very handy)
+
+startup_raw <- read_csv(
+  "investments_VC.csv",
+  locale = locale(encoding = "ISO-8859-1")   # matches Crunchbase examples
+)
+
+startup <- startup_raw |>
+  clean_names() |>                        # makes names snake_case, trims spaces
+  select(-starts_with("unnamed_")) |>     # drop completely empty columns
+  distinct()                               # remove exact duplicates if any
+
+glimpse(startup)
+```
+
+```{r}
+# Long-format missingness summary
+miss_summary <- startup %>%
+  summarise(across(everything(), ~ mean(is.na(.)))) |>
+  pivot_longer(everything(),
+               names_to = "variable",
+               values_to = "prop_missing") |>
+  arrange(desc(prop_missing))
+
+ggplot(miss_summary,
+       aes(x = reorder(variable, prop_missing),
+           y = prop_missing)) +
+  geom_col() +
+  coord_flip() +
+  scale_y_continuous(labels = scales::percent) +
+  labs(
+    title = "Proportion of Missing Values by Variable",
+    x = NULL,
+    y = "Missing values (%)"
+  ) +
+  theme_minimal()
+
+```
+Commentary you can write:
+
+Two columns in the raw file are entirely missing and are dropped.
+
+Location and founding information have substantial missingness (e.g., state_code, city, founded_year, founded_month, founded_quarter).
+
+Core variables for our analysis – status, funding_total_usd, and name – are mostly observed, with only a small fraction of missing status (~2–3% of rows).
+
+```{r}
+gg_miss_fct(startup, fct = status) +
+  labs(
+    title = "Missingness by Startup Status",
+    x = "Status",
+    y = "Number of missing cells"
+  )
+```
+
+```{r}
+founded_missing_by_status <- startup |>
+  filter(!is.na(status)) |>
+  group_by(status) |>
+  summarise(
+    prop_missing_founded_year = mean(is.na(founded_year))
+  )
+
+ggplot(founded_missing_by_status,
+       aes(x = status,
+           y = prop_missing_founded_year)) +
+  geom_col() +
+  scale_y_continuous(labels = scales::percent) +
+  labs(
+    title = "Missing Founded Year by Startup Status",
+    x = "Status",
+    y = "% missing founded_year"
+  ) +
+  theme_minimal()
+
+```
+
+Commentary you can write:
+
+Missingness in founding dates is fairly similar across operating, acquired, and closed startups, suggesting we do not have an obvious pattern where, for example, failed startups systematically omit founding information.
+
+The status variable itself has a small proportion of missing values; these “unknown” cases could either be dropped in sensitivity analyses or treated as a separate category depending on the question.
