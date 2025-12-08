@@ -28,27 +28,31 @@ glimpse(startup)
 ```
 
 ```{r}
-# Long-format missingness summary
-miss_summary <- startup %>%
+miss_summary <- startup |>
   summarise(across(everything(), ~ mean(is.na(.)))) |>
   pivot_longer(everything(),
                names_to = "variable",
                values_to = "prop_missing") |>
+  filter(prop_missing > 0) |>             # drop variables with no missing (optional)
   arrange(desc(prop_missing))
 
-ggplot(miss_summary,
+gg_miss_vars <- ggplot(miss_summary,
        aes(x = reorder(variable, prop_missing),
            y = prop_missing)) +
-  geom_col() +
+  geom_col(fill = "#4C72B0") +
   coord_flip() +
   scale_y_continuous(labels = scales::percent) +
   labs(
-    title = "Proportion of Missing Values by Variable",
+    title    = "Some Variables Have Substantial Missing Data",
+    subtitle = "Share of observations with missing values by variable",
     x = NULL,
     y = "Missing values (%)"
   ) +
-  theme_minimal()
+  theme(
+    plot.title = element_text(face = "bold")
+  )
 
+gg_miss_vars
 ```
 Commentary you can write:
 
@@ -69,24 +73,29 @@ gg_miss_fct(startup, fct = status) +
 
 ```{r}
 founded_missing_by_status <- startup |>
-  filter(!is.na(status)) |>
   group_by(status) |>
   summarise(
-    prop_missing_founded_year = mean(is.na(founded_year))
+    prop_missing_founded_year = mean(is.na(founded_year)),
+    n = n(),
+    .groups = "drop"
   )
 
-ggplot(founded_missing_by_status,
+gg_miss_status <- ggplot(founded_missing_by_status,
        aes(x = status,
            y = prop_missing_founded_year)) +
-  geom_col() +
+  geom_col(fill = "#4C72B0") +
   scale_y_continuous(labels = scales::percent) +
   labs(
-    title = "Missing Founded Year by Startup Status",
-    x = "Status",
-    y = "% missing founded_year"
+    title    = "Missing Founded Year Is Similar Across Startup Outcomes",
+    subtitle = "Share of startups with missing founded_year within each status category",
+    x = NULL,
+    y = "Missing founded_year (%)"
   ) +
-  theme_minimal()
+  theme(
+    plot.title = element_text(face = "bold")
+  )
 
+gg_miss_status
 ```
 
 Commentary you can write:
