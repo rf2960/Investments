@@ -8,11 +8,11 @@ execute:
   message: false
 
 book:
-  title: "YOUR PROJECT TITLE"
+  title: "Investments"
   author:
-    - AUTHOR1 (UNI1)
-    - AUTHOR2 (UNI2)
-  repo-url: https://github.com/YOUR_GITHUB_ACCOUNT/REPO_NAME
+    - Ruochen Feng (rf2960)
+    - Andrew Chen (yc4745)
+  repo-url: https://github.com/rf2960/Investments.git
   date: today
   page-footer:
     right: |
