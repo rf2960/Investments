@@ -1,10 +1,4 @@
 # Results
-
-```{r}
-install.packages("ggalluvial")
-```
-
-
 ```{r}
 library(tidyverse)
 library(janitor)
@@ -16,6 +10,7 @@ library(ggalluvial)
 # Bigger, easy-to-read base font for all plots
 theme_set(theme_minimal(base_size = 14))
 ```
+
 ```{r}
 status_palette <- c(
   operating = "#4C72B0",
@@ -25,6 +20,23 @@ status_palette <- c(
 )
 ```
 
+```{r}
+library(tidyverse)
+library(janitor)
+library(naniar)  # for missingness plots (optional but very handy)
+
+startup_raw <- read_csv(
+  "investments_VC.csv",
+  locale = locale(encoding = "ISO-8859-1")   # matches Crunchbase examples
+)
+
+startup <- startup_raw |>
+  clean_names() |>                        # makes names snake_case, trims spaces
+  select(-starts_with("unnamed_")) |>     # drop completely empty columns
+  distinct()                               # remove exact duplicates if any
+
+glimpse(startup)
+```
 
 ```{r}
 status_counts <- startup |> 
@@ -127,6 +139,8 @@ gg_top_markets
 ```
 
 ```{r}
+top_market_names <- top_markets$market
+
 gg_market_status <- startup |>
   filter(market %in% top_market_names) |>
   count(market, status) |>
@@ -289,7 +303,7 @@ startup_alluvial <- startup %>%
   drop_na(founded_period, rounds_bucket)
 
 gg_alluvial <- ggplot(
-  startup_alluvial_sample,
+  startup_alluvial,
   aes(
     axis1 = founded_period,
     axis2 = rounds_bucket,
@@ -343,6 +357,20 @@ gg_alluvial
 ```
 
 ```{r}
+startup_facet <- startup |> 
+  filter(funding_total_usd > 0, !is.na(funding_rounds), !is.na(status)) |> 
+  mutate( rounds_bucket = case_when( 
+    funding_rounds == 0 ~ "0 rounds", 
+    funding_rounds == 1 ~ "1 round", 
+    funding_rounds %in% 2:3 ~ "2–3 rounds", 
+    funding_rounds >= 4 ~ "4+ rounds", 
+    TRUE ~ NA_character_ ), 
+    rounds_bucket = factor( 
+      rounds_bucket, 
+      levels = c("0 rounds", "1 round", "2–3 rounds", "4+ rounds") 
+      ) 
+    ) %>% drop_na(rounds_bucket)
+
 gg_facet_funding_rounds <- ggplot(
   startup_facet,
   aes(x = rounds_bucket, y = funding_total_usd, fill = status)

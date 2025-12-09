@@ -1,6 +1,7 @@
 # Data
 
 ## Description
+The dataset used in this project is the Startup Investments dataset documented by Crunchbase, publicly available on Github (https://raw.githubusercontent.com/notpeter/crunchbase-data/master/investments.csv), containing venture-backed startup information originally compiled from the Crunchbase platform and redistributed through an open data repository. The dataset represents a snapshot rather than a continuously updated feed and includes firm-level records collected by Crunchbase through self-reporting by companies, investor disclosures, and public announcements. The CSV file contains approximately 49,000 startups and 40 variables, including founding year, market category, geographic location, funding totals, number of funding rounds, and final company status (e.g., operating, acquired, closed, IPO). Each row corresponds to a single startup, with funding information aggregated across its lifetime rather than reported at a transactional level. Because the data are a static snapshot, they do not reflect real-time updates, and younger companies are more likely to appear as “operating,” introducing survivorship and censoring effects. Additional data quality issues include missing values in founding dates and funding fields, inconsistent market labels, and the absence of small or unreported startups that never appear in venture databases.
 
 ## Missing value analysis
 
