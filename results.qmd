@@ -15,8 +15,7 @@ theme_set(theme_minimal(base_size = 14))
 status_palette <- c(
   operating = "#4C72B0",
   acquired  = "#55A868",
-  closed    = "#C44E52",
-  ipo       = "#8172B2"
+  closed    = "#C44E52"
 )
 ```
 
@@ -27,13 +26,14 @@ library(naniar)
 
 startup_raw <- read_csv(
   "investments_VC.csv",
-  locale = locale(encoding = "ISO-8859-1")   # matches examples
+  locale = locale(encoding = "ISO-8859-1")   # matches Crunchbase examples
 )
 
 startup <- startup_raw |>
   clean_names() |>                        # makes names snake_case, trims spaces
   select(-starts_with("unnamed_")) |>     # drop completely empty columns
-  distinct()                               # remove exact duplicates if any
+  distinct() |>                            # remove exact duplicates if any
+  filter(!is.na(status))
 ```
 
 Across the dataset, most startups remain operating, while acquisition and closure outcomes are relatively rare and accumulate over time. Funding intensity and industry context are strongly associated with outcomes, with older cohorts and heavily funded startups more likely to experience exits. These patterns suggest that time, fundraising depth, and market segment jointly shape startup trajectories.
@@ -71,7 +71,7 @@ Operating startups dominate the dataset, reflecting both the prevalence of ongoi
 
 ```{r}
 gg_funding_status <- startup |>
-  filter(funding_total_usd > 0, !is.na(status)) |>
+  filter(funding_total_usd > 0) |>
   ggplot(aes(x = status, y = funding_total_usd, fill = status)) +
   geom_boxplot(
     color = "black",
@@ -106,6 +106,7 @@ Acquired startups tend to raise substantially more total funding than closed fir
 ```{r}
 top_markets <- startup |>
   count(market, sort = TRUE) |>
+  filter(!is.na(market)) |>
   slice_head(n = 15)
 
 gg_top_markets <- ggplot(
@@ -249,7 +250,7 @@ gg_founded_status
 Older startup cohorts show higher acquisition and closure rates because they’ve had more time to progress toward an outcome, whereas most recently founded companies remain in operation by default.
 
 ```{r}
-# Get top 6 markets
+# Get top 5 markets
 top_markets <- startup |>
   count(market, sort = TRUE) |>
   slice_head(n = 6) |>
@@ -275,9 +276,9 @@ mosaicplot(
   xlab = "Market",
   ylab = "Proportion within Each Market",
   las = 1,
-  cex.axis = 0.65,   # ✅ smaller tick labels
-  cex.lab  = 1.0,   # ✅ axis labels readable
-  cex.main = 1.2    # ✅ title not overpowering
+  cex.axis = 0.65,   # smaller tick labels
+  cex.lab  = 1.0,   # axis labels readable
+  cex.main = 1.2    # title not overpowering
 )
 
 
