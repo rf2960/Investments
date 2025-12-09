@@ -23,11 +23,11 @@ status_palette <- c(
 ```{r}
 library(tidyverse)
 library(janitor)
-library(naniar)  # for missingness plots (optional but very handy)
+library(naniar)
 
 startup_raw <- read_csv(
   "investments_VC.csv",
-  locale = locale(encoding = "ISO-8859-1")   # matches Crunchbase examples
+  locale = locale(encoding = "ISO-8859-1")   # matches examples
 )
 
 startup <- startup_raw |>
@@ -410,8 +410,8 @@ gg_facet_funding_rounds
 ```
 
 ```{r}
-startup_year_status <- startup %>%
-  filter(!is.na(founded_year), status != "unknown") %>%
+startup_year_status <- startup |>
+  filter(!is.na(founded_year), status != "unknown") |>
   count(status, founded_year)
 
 gg_facet_year_status <- ggplot(
