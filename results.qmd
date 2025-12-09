@@ -16,15 +16,29 @@ library(ggalluvial)
 # Bigger, easy-to-read base font for all plots
 theme_set(theme_minimal(base_size = 14))
 ```
+```{r}
+status_palette <- c(
+  operating = "#4C72B0",
+  acquired  = "#55A868",
+  closed    = "#C44E52",
+  ipo       = "#8172B2"
+)
+```
 
 
 ```{r}
-status_counts <- startup |> count(status)
+status_counts <- startup |> 
+  count(status)
 
-gg_status_counts <- ggplot(status_counts,
-       aes(x = status, y = n)) +
-  geom_col(fill = "#4C72B0") +
-  scale_y_continuous(labels = label_number(scale_cut = cut_si(""), accuracy = 1)) +
+gg_status_counts <- ggplot(
+  status_counts,
+  aes(x = status, y = n, fill = status)
+) +
+  geom_col() +
+  scale_fill_manual(values = status_palette) +
+  scale_y_continuous(
+    labels = label_number(scale_cut = cut_si(""), accuracy = 1)
+  ) +
   labs(
     title    = "Most Startups in the Sample Are Still Operating",
     subtitle = "Count of startups by current Crunchbase status",
@@ -32,22 +46,27 @@ gg_status_counts <- ggplot(status_counts,
     y = "Number of startups"
   ) +
   theme(
-    plot.title = element_text(face = "bold")
+    plot.title   = element_text(face = "bold", size = 15),
+    plot.subtitle= element_text(size = 12),
+    legend.position = "none"   # optional but clean here
   )
 
 gg_status_counts
-
 ```
 
 ```{r}
 gg_funding_status <- startup |>
   filter(funding_total_usd > 0, !is.na(status)) |>
-  ggplot(aes(x = status, y = funding_total_usd)) +
-  geom_boxplot(fill = "#4C72B0", color = "black", outlier.alpha = 0.3) +
+  ggplot(aes(x = status, y = funding_total_usd, fill = status)) +
+  geom_boxplot(
+    color = "black",
+    outlier.alpha = 0.3
+  ) +
+  scale_fill_manual(values = status_palette) +
   scale_y_log10(
     labels = scales::label_number(
       prefix = "$",
-      scale_cut = cut_si(""),   # converts 1000000 → 1M
+      scale_cut = cut_si(""),
       accuracy = 1
     ),
     breaks = c(1e5, 1e6, 1e7, 1e8, 1e9)
@@ -59,11 +78,12 @@ gg_funding_status <- startup |>
     y = "Total funding (USD, log scale)"
   ) +
   theme(
-    plot.title = element_text(face = "bold")
+    plot.title    = element_text(face = "bold", size = 15),
+    plot.subtitle = element_text(size = 12),
+    legend.position = "none"   # clean, since x already shows status
   )
 
 gg_funding_status
-
 ```
 
 ```{r}
@@ -71,15 +91,22 @@ top_markets <- startup |>
   count(market, sort = TRUE) |>
   slice_head(n = 15)
 
-gg_top_markets <- ggplot(top_markets,
-                         aes(x = reorder(market, n), y = n)) +
-  geom_col(fill = "#4C72B0") +
+gg_top_markets <- ggplot(
+  top_markets,
+  aes(x = fct_reorder(market, n), y = n)
+) +
+  geom_col(
+    fill  = "#4C72B0",
+    alpha = 0.9,
+    width = 0.75
+  ) +
   coord_flip() +
   scale_y_continuous(
     labels = label_number(
       scale_cut = cut_si(""),
       accuracy  = 1
-    )
+    ),
+    expand = expansion(mult = c(0, 0.05))
   ) +
   labs(
     title    = "Software and Biotech Dominate the Dataset",
@@ -88,26 +115,37 @@ gg_top_markets <- ggplot(top_markets,
     y = "Number of startups"
   ) +
   theme(
-    plot.title = element_text(face = "bold")
+    plot.title    = element_text(face = "bold", size = 15),
+    plot.subtitle = element_text(size = 12),
+    axis.text.y   = element_text(size = 11),
+    axis.text.x   = element_text(size = 10),
+    panel.grid.major.y = element_blank(),
+    panel.grid.minor   = element_blank()
   )
 
 gg_top_markets
 ```
 
 ```{r}
-top_market_names <- top_markets$market
-
 gg_market_status <- startup |>
   filter(market %in% top_market_names) |>
   count(market, status) |>
   group_by(market) |>
   mutate(prop = n / sum(n)) |>
-  ggplot(aes(x = fct_reorder(market, prop),
-             y = prop,
-             fill = status)) +
-  geom_col() +
+  ggplot(
+    aes(
+      x    = fct_reorder(market, prop),
+      y    = prop,
+      fill = status
+    )
+  ) +
+  geom_col(width = 0.8) +
   coord_flip() +
-  scale_y_continuous(labels = label_percent(accuracy = 1)) +
+  scale_fill_manual(values = status_palette) +
+  scale_y_continuous(
+    labels = label_percent(accuracy = 1),
+    expand = expansion(mult = c(0, 0.02))
+  ) +
   labs(
     title    = "Most Markets Are Dominated by Operating Startups",
     subtitle = "Within each of the top 15 markets, share of startups by status",
@@ -115,8 +153,9 @@ gg_market_status <- startup |>
     y = "Share of startups"
   ) +
   theme(
-    plot.title   = element_text(face = "bold"),
-    legend.title = element_blank()
+    plot.title    = element_text(face = "bold", size = 15),
+    plot.subtitle = element_text(size = 12),
+    legend.title  = element_blank()
   )
 
 gg_market_status
@@ -127,8 +166,14 @@ gg_founded_year <- startup |>
   filter(!is.na(founded_year)) |>
   count(founded_year) |>
   ggplot(aes(x = founded_year, y = n)) +
-  geom_line(linewidth = 1) +
-  geom_point(size = 2) +
+  geom_line(
+    linewidth = 1.2,
+    color = "#4C72B0"
+  ) +
+  geom_point(
+    size = 2.4,
+    color = "#4C72B0"
+  ) +
   scale_y_continuous(
     labels = label_number(
       scale_cut = cut_si(""),
@@ -142,7 +187,8 @@ gg_founded_year <- startup |>
     y = "Number of startups"
   ) +
   theme(
-    plot.title = element_text(face = "bold")
+    plot.title    = element_text(face = "bold", size = 15),
+    plot.subtitle = element_text(size = 12)
   )
 
 gg_founded_year
@@ -155,7 +201,8 @@ gg_founded_status <- startup |>
   group_by(founded_year) |>
   mutate(prop = n / sum(n)) |>
   ggplot(aes(x = founded_year, y = prop, fill = status)) +
-  geom_area(alpha = 0.9) +
+  geom_area(alpha = 0.85, color = "white", linewidth = 0.2) +
+  scale_fill_manual(values = status_palette) +
   scale_y_continuous(labels = label_percent(accuracy = 1)) +
   labs(
     title    = "Older Cohorts Have Had More Time to Be Acquired or Close",
@@ -164,101 +211,13 @@ gg_founded_status <- startup |>
     y = "Share of startups"
   ) +
   theme(
-    plot.title   = element_text(face = "bold"),
-    legend.title = element_blank()
+    plot.title    = element_text(face = "bold", size = 15),
+    plot.subtitle = element_text(size = 12),
+    legend.title  = element_blank(),
+    legend.position = "bottom"
   )
 
 gg_founded_status
-```
-
-```{r}
-top_countries <- startup |>
-  count(country_code, sort = TRUE) |>
-  slice_head(n = 10)
-
-gg_top_countries <- ggplot(top_countries,
-                           aes(x = reorder(country_code, n), y = n)) +
-  geom_col(fill = "#4C72B0") +
-  coord_flip() +
-  scale_y_continuous(
-    labels = label_number(
-      scale_cut = cut_si(""),
-      accuracy  = 1
-    )
-  ) +
-  labs(
-    title    = "The United States Dominates the Sample",
-    subtitle = "Top 10 countries by number of startups",
-    x = "Country code",
-    y = "Number of startups"
-  ) +
-  theme(
-    plot.title = element_text(face = "bold")
-  )
-
-gg_top_countries
-```
-
-```{r}
-gg_rounds_status <- startup |>
-  filter(!is.na(funding_rounds), !is.na(status)) |>
-  ggplot(aes(x = status, y = funding_rounds)) +
-  geom_boxplot(fill = "#4C72B0", color = "black", outlier.alpha = 0.3) +
-  labs(
-    title    = "Acquired Startups Often Go Through More Rounds of Funding",
-    subtitle = "Number of distinct funding rounds by status",
-    x = NULL,
-    y = "Number of funding rounds"
-  ) +
-  theme(
-    plot.title = element_text(face = "bold")
-  )
-
-gg_rounds_status
-```
-
-```{r}
-startup <- startup_raw |>
-  clean_names() |>
-  select(-starts_with("unnamed_")) |>
-  distinct() |>
-  mutate(
-    status = fct_explicit_na(status, "unknown"),
-    status = fct_relevel(status, "operating", "acquired", "closed", "unknown"),
-
-    # Clean date-like variables — remove zero dates, empty strings, etc.
-    founded_at = na_if(founded_at, "0000-00-00"),
-    first_funding_at = na_if(first_funding_at, "0000-00-00"),
-
-    founded_at = na_if(founded_at, ""),
-    first_funding_at = na_if(first_funding_at, ""),
-
-    # Convert to Date
-    founded_at = ymd(founded_at, quiet = TRUE),
-    first_funding_at = ymd(first_funding_at, quiet = TRUE)
-  )
-
-
-startup <- startup |>
-  mutate(time_to_first_funding = as.numeric(first_funding_at - founded_at))
-
-gg_time_to_funding <- startup |>
-  filter(!is.na(time_to_first_funding),
-         time_to_first_funding >= 0,
-         time_to_first_funding <= 3650) |>  # cap at 10 years
-  ggplot(aes(x = status, y = time_to_first_funding)) +
-  geom_boxplot(fill = "#4C72B0", color = "black", outlier.alpha = 0.3) +
-  labs(
-    title    = "Time to First Funding Is Similar Across Outcomes",
-    subtitle = "Days between founding date and first funding round",
-    x = NULL,
-    y = "Days from founding to first funding"
-  ) +
-  theme(
-    plot.title = element_text(face = "bold")
-  )
-
-gg_time_to_funding
 ```
 
 ```{r}
@@ -268,32 +227,37 @@ top_markets <- startup |>
   slice_head(n = 6) |>
   pull(market)
 
+# shorten market labels slightly (important)
 mosaic_data <- startup |>
   filter(market %in% top_markets) |>
   mutate(
-    market = fct_reorder(market, as.numeric(status), .fun = length, .desc = TRUE)
+    market = str_replace_all(market, " ", "\n")
   ) |>
   select(market, status)
 
-# Convert to contingency table
 tbl <- table(mosaic_data$market, mosaic_data$status)
 
-par(mar = c(6, 8, 6, 4))  
+# Increase margins but not excessively
+par(mar = c(6, 6, 3, 3))
 
-# Mosaic plot
 mosaicplot(
   tbl,
   color = RColorBrewer::brewer.pal(n = ncol(tbl), "Set2"),
   main = "Outcome Mix Varies Across Major Startup Markets",
   xlab = "Market",
   ylab = "Proportion within Each Market",
-  las = 2,
-  cex.axis = 1.2
+  las = 1,
+  cex.axis = 0.65,   # ✅ smaller tick labels
+  cex.lab  = 1.0,   # ✅ axis labels readable
+  cex.main = 1.2    # ✅ title not overpowering
 )
+
 
 ```
 
 ```{r}
+library(ggalluvial)
+
 startup_alluvial <- startup %>%
   filter(
     !is.na(founded_year),
@@ -301,7 +265,11 @@ startup_alluvial <- startup %>%
     !is.na(status)
   ) %>%
   mutate(
-    # group founding years into periods (tweak breaks/labels as you like)
+    status = factor(
+      status,
+      levels = c("operating", "acquired", "closed", "ipo")
+    ),
+    
     founded_period = cut(
       founded_year,
       breaks = c(1990, 2000, 2005, 2010, 2015, 2020),
@@ -311,19 +279,14 @@ startup_alluvial <- startup %>%
       right = FALSE
     ),
     
-    # bucket number of funding rounds
     rounds_bucket = case_when(
-      funding_rounds == 0            ~ "0 rounds",
-      funding_rounds == 1            ~ "1 round",
-      funding_rounds %in% 2:3        ~ "2–3 rounds",
-      funding_rounds >= 4            ~ "4+ rounds",
-      TRUE                           ~ NA_character_
+      funding_rounds == 0     ~ "0 rounds",
+      funding_rounds == 1     ~ "1 round",
+      funding_rounds %in% 2:3 ~ "2–3 rounds",
+      funding_rounds >= 4     ~ "4+ rounds"
     )
   ) %>%
   drop_na(founded_period, rounds_bucket)
-
-# (Optional) shrink sample so plot is not too dense
-startup_alluvial_sample <- startup_alluvial %>% slice_sample(n = 5000)
 
 gg_alluvial <- ggplot(
   startup_alluvial_sample,
@@ -334,82 +297,88 @@ gg_alluvial <- ggplot(
     y     = ..count..
   )
 ) +
-  # flows
-  geom_alluvium(aes(fill = status),
-                width = 1/12, alpha = 0.7) +
-  # blocks
-  geom_stratum(width = 1/6, fill = "grey85", color = "grey40") +
-  geom_text(stat = "stratum",
-            aes(label = after_stat(stratum)),
-            size = 3.5) +
+  geom_alluvium(
+    aes(fill = status),
+    width = 1/10,
+    alpha = 0.85
+  ) +
+  geom_stratum(
+    width  = 1/5,
+    fill   = "grey92",
+    color  = "grey50"
+  ) +
+  geom_text(
+    stat = "stratum",
+    aes(
+      label = after_stat(stratum),
+      y = after_stat(y)
+    ),
+    vjust = 0.5,
+    size  = 3.0,
+    color = "grey25"
+  ) +
+  scale_fill_manual(values = status_palette, drop = FALSE) +
   scale_x_discrete(
-    limits = c("Founding period", "Funding rounds", "Status"),
-    expand = c(.08, .08)
+    limits = c("Founded period", "Funding rounds", "Final status"),
+    expand = c(.10, .05)
   ) +
-  scale_fill_brewer(palette = "Set2") +
   labs(
-    title    = "Funding Rounds and Outcomes Vary Across Startup Cohorts",
-    subtitle = "Alluvial plot linking founding period, number of funding rounds, and final status",
+    title    = "Funding Trajectories and Outcomes Differ Across Startup Cohorts",
+    subtitle = "Founding period, funding intensity, and final startup status",
     x        = NULL,
-    y        = "Number of startups",
-    fill     = "Status"
+    y        = "Number of startups"
   ) +
-  theme_minimal(base_size = 16) +
+  theme_minimal(base_size = 14) +
   theme(
-    plot.title   = element_text(face = "bold"),
-    axis.text.x  = element_text(size = 12),
-    legend.title = element_blank()
+    plot.title      = element_text(face = "bold", size = 15),
+    plot.subtitle   = element_text(size = 12),
+    axis.text.y     = element_blank(),
+    panel.grid      = element_blank(),
+    legend.position = "bottom",
+    legend.title    = element_blank()
   )
 
 gg_alluvial
+
 ```
 
 ```{r}
-startup_facet <- startup |>
-  filter(funding_total_usd > 0, !is.na(funding_rounds), !is.na(status)) |>
-  mutate(
-    rounds_bucket = case_when(
-      funding_rounds == 0       ~ "0 rounds",
-      funding_rounds == 1       ~ "1 round",
-      funding_rounds %in% 2:3   ~ "2–3 rounds",
-      funding_rounds >= 4       ~ "4+ rounds",
-      TRUE                      ~ NA_character_
-    ),
-    rounds_bucket = factor(
-      rounds_bucket,
-      levels = c("0 rounds", "1 round", "2–3 rounds", "4+ rounds")
-    )
-  ) %>%
-  drop_na(rounds_bucket)
-
 gg_facet_funding_rounds <- ggplot(
   startup_facet,
-  aes(x = rounds_bucket, y = funding_total_usd)
+  aes(x = rounds_bucket, y = funding_total_usd, fill = status)
 ) +
-  geom_boxplot(fill = "#4C72B0", color = "black", outlier.alpha = 0.3) +
+  geom_boxplot(
+    width = 0.65,
+    color = "grey30",
+    outlier.alpha = 0.25
+  ) +
+  scale_fill_manual(values = status_palette) +
   scale_y_log10(
     labels = label_number(
       prefix    = "$",
-      scale_cut = cut_si(""),  # 1e6 -> $1M
+      scale_cut = cut_si(""),
       accuracy  = 1
     )
   ) +
   facet_wrap(~ status, ncol = 2) +
   labs(
     title    = "More Funding Rounds Are Associated with Larger Total Investments",
-    subtitle = "Distribution of total funding by number of rounds, shown separately for each outcome",
+    subtitle = "Distribution of total funding by number of rounds, shown separately by startup outcome",
     x        = "Number of funding rounds",
     y        = "Total funding (USD, log scale)"
   ) +
-  theme_minimal(base_size = 16) +
+  theme_minimal(base_size = 14) +
   theme(
-    plot.title   = element_text(face = "bold"),
-    axis.text.x  = element_text(angle = 0),
+    plot.title      = element_text(face = "bold", size = 12),
+    plot.subtitle   = element_text(size = 10),
+    strip.text      = element_text(face = "bold", size = 11),
+    axis.text.x     = element_text(size = 8),
+    axis.text.y     = element_text(size = 8),
+    panel.grid.minor = element_blank(),
     legend.position = "none"
   )
 
 gg_facet_funding_rounds
-
 ```
 
 ```{r}
@@ -419,9 +388,13 @@ startup_year_status <- startup %>%
 
 gg_facet_year_status <- ggplot(
   startup_year_status,
-  aes(x = founded_year, y = n)
+  aes(x = founded_year, y = n, fill = status)
 ) +
-  geom_col(fill = "#4C72B0") +
+  geom_col(
+    alpha = 0.9,
+    width = 0.85
+  ) +
+  scale_fill_manual(values = status_palette) +
   facet_wrap(~ status, ncol = 2, scales = "free_y") +
   labs(
     title    = "Startup Founding Trends Differ Across Outcomes",
@@ -429,10 +402,15 @@ gg_facet_year_status <- ggplot(
     x        = "Year founded",
     y        = "Number of startups"
   ) +
-  theme_minimal(base_size = 16) +
+  theme_minimal(base_size = 14) +
   theme(
-    plot.title  = element_text(face = "bold"),
-    axis.text.x = element_text(angle = 45, hjust = 1)
+    plot.title    = element_text(face = "bold", size = 15),
+    plot.subtitle = element_text(size = 12),
+    axis.text.x   = element_text(angle = 45, hjust = 1, size = 10),
+    axis.text.y   = element_text(size = 11),
+    strip.text    = element_text(face = "bold", size = 12),
+    panel.grid.minor = element_blank(),
+    legend.position = "none"
   )
 
 gg_facet_year_status
