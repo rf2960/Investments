@@ -6,11 +6,6 @@ The dataset used in this project is the Startup Investments dataset documented b
 ## Missing value analysis
 
 ```{r}
-# install.packages("naniar")
-```
-
-
-```{r}
 library(tidyverse)
 library(janitor)
 library(naniar)  # for missingness plots (optional but very handy)
@@ -29,48 +24,40 @@ glimpse(startup)
 ```
 
 ```{r}
-miss_summary <- startup |>
-  summarise(across(everything(), ~ mean(is.na(.)))) |>
-  pivot_longer(everything(),
-               names_to = "variable",
-               values_to = "prop_missing") |>
-  filter(prop_missing > 0) |>             # drop variables with no missing (optional)
-  arrange(desc(prop_missing))
-
-gg_miss_vars <- ggplot(miss_summary,
-       aes(x = reorder(variable, prop_missing),
-           y = prop_missing)) +
-  geom_col(fill = "#4C72B0") +
-  coord_flip() +
-  scale_y_continuous(labels = scales::percent) +
-  labs(
-    title    = "Some Variables Have Substantial Missing Data",
-    subtitle = "Share of observations with missing values by variable",
-    x = NULL,
-    y = "Missing values (%)"
-  ) +
-  theme(
-    plot.title = element_text(face = "bold")
-  )
-
-gg_miss_vars
+status_palette <- c(
+  operating = "#4C72B0",
+  acquired  = "#55A868",
+  closed    = "#C44E52",
+  ipo       = "#8172B2"
+)
 ```
-Commentary you can write:
-
-Two columns in the raw file are entirely missing and are dropped.
-
-Location and founding information have substantial missingness (e.g., state_code, city, founded_year, founded_month, founded_quarter).
-
-Core variables for our analysis – status, funding_total_usd, and name – are mostly observed, with only a small fraction of missing status (~2–3% of rows).
 
 ```{r}
 gg_miss_fct(startup, fct = status) +
+  scale_fill_gradient(
+    low  = "#DCE6F2",
+    high = "#4C72B0"
+  ) +
   labs(
-    title = "Missingness by Startup Status",
-    x = "Status",
-    y = "Number of missing cells"
+    title    = "Missing Values by Startup Status",
+    subtitle = "Count of missing entries across variables, grouped by status",
+    x = "Startup status",
+    y = "Number of missing values"
+  ) +
+  theme_minimal(base_size = 14) +
+  theme(
+    plot.title      = element_text(face = "bold", size = 15),
+    plot.subtitle   = element_text(size = 12),
+    axis.text.x     = element_text(size = 9),
+    axis.text.y     = element_text(size = 9),
+    panel.grid.minor = element_blank(),
+    legend.position = "right"
   )
 ```
+
+The figure above summarizes the total number of missing entries across all variables by startup status, showing that operating startups account for the largest volume of missing data. 
+
+Two columns (x41 and x40) in the raw file are entirely missing and are dropped. Location and founding information have substantial missingness (e.g., state_code, city, founded_year, founded_month, founded_quarter). Core variables for our analysis, including status, funding_total_usd, and name, are mostly observed, with only a small fraction of missing status (~2–3% of rows).
 
 ```{r}
 founded_missing_by_status <- startup |>
@@ -81,26 +68,37 @@ founded_missing_by_status <- startup |>
     .groups = "drop"
   )
 
-gg_miss_status <- ggplot(founded_missing_by_status,
-       aes(x = status,
-           y = prop_missing_founded_year)) +
-  geom_col(fill = "#4C72B0") +
-  scale_y_continuous(labels = scales::percent) +
+gg_miss_status <- ggplot(
+  founded_missing_by_status,
+  aes(x = status, y = prop_missing_founded_year, fill = status)
+) +
+  geom_col(
+    width = 0.7,
+    alpha = 0.9
+  ) +
+  scale_fill_manual(values = status_palette) +
+  scale_y_continuous(
+    labels = scales::percent_format(accuracy = 1)
+  ) +
   labs(
     title    = "Missing Founded Year Is Similar Across Startup Outcomes",
     subtitle = "Share of startups with missing founded_year within each status category",
     x = NULL,
     y = "Missing founded_year (%)"
   ) +
+  theme_minimal(base_size = 14) +
   theme(
-    plot.title = element_text(face = "bold")
+    plot.title    = element_text(face = "bold", size = 15),
+    plot.subtitle = element_text(size = 12),
+    axis.text.x   = element_text(size = 9),
+    axis.text.y   = element_text(size = 9),
+    panel.grid.minor = element_blank(),
+    legend.position = "none"  
   )
 
 gg_miss_status
+
 ```
+This figure focuses specifically on the founding year variable and shows that the proportion of startups with missing founding dates is relatively similar across outcome categories, ranging from roughly 20% to 25% for acquired, closed, and operating firms. Although startups with missing or unknown status show slightly higher missingness about 30%, the overall similarity across outcomes suggests that missing founding-year information is unlikely to bias comparisons of outcomes over time. 
 
-Commentary you can write:
-
-Missingness in founding dates is fairly similar across operating, acquired, and closed startups, suggesting we do not have an obvious pattern where, for example, failed startups systematically omit founding information.
-
-The status variable itself has a small proportion of missing values; these “unknown” cases could either be dropped in sensitivity analyses or treated as a separate category depending on the question.
+Together, these results indicate that while missing data are common—particularly in funding-related fields—their distribution is largely consistent across status categories, allowing downstream exploratory analyses to remain interpretable with appropriate filtering and caution.
