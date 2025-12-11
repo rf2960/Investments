@@ -174,8 +174,19 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 </nav>
 <div id="quarto-sidebar-glass" class="quarto-sidebar-collapse-item" data-bs-toggle="collapse" data-bs-target=".quarto-sidebar-collapse-item"></div>
 <!-- margin-sidebar -->
-    <div id="quarto-margin-sidebar" class="sidebar margin-sidebar zindex-bottom">
-        
+    <div id="quarto-margin-sidebar" class="sidebar margin-sidebar">
+        <nav id="TOC" role="doc-toc" class="toc-active">
+    <h2 id="toc-title">Table of contents</h2>
+   
+  <ul>
+  <li><a href="#executive-summary" id="toc-executive-summary" class="nav-link active" data-scroll-target="#executive-summary"><span class="header-section-number">3.1</span> Executive Summary</a></li>
+  <li><a href="#exploratory-data-analysis" id="toc-exploratory-data-analysis" class="nav-link" data-scroll-target="#exploratory-data-analysis"><span class="header-section-number">3.2</span> Exploratory Data Analysis</a>
+  <ul class="collapse">
+  <li><a href="#initial-glance-at-startup-information" id="toc-initial-glance-at-startup-information" class="nav-link" data-scroll-target="#initial-glance-at-startup-information"><span class="header-section-number">3.2.1</span> Initial Glance at Startup Information</a></li>
+  <li><a href="#status-focus-investigation" id="toc-status-focus-investigation" class="nav-link" data-scroll-target="#status-focus-investigation"><span class="header-section-number">3.2.2</span> Status-Focus Investigation</a></li>
+  </ul></li>
+  </ul>
+<div class="toc-actions"><ul><li><a href="https://github.com/rf2960/Investments.git/edit/main/results.qmd" class="toc-action"><i class="bi bi-github"></i>Edit this page</a></li><li><a href="https://github.com/rf2960/Investments.git/issues/new" class="toc-action"><i class="bi empty"></i>Report an issue</a></li></ul></div></nav>
     </div>
 <!-- main -->
 <main class="content" id="quarto-document-content">
@@ -199,18 +210,22 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 </header>
 
 
+<section id="executive-summary" class="level2" data-number="3.1">
+<h2 data-number="3.1" class="anchored" data-anchor-id="executive-summary"><span class="header-section-number">3.1</span> Executive Summary</h2>
+<p>Across the startups, the majority of them remain operating, while acquisition and closure outcomes are relatively rare and accumulate over time. Funding intensity and industry context are strongly associated with outcomes, with older cohorts and heavily funded startups more likely to experience exits. These patterns suggest that time, fundraising depth, and market segment jointly shape startup trajectories.</p>
 <div class="cell">
 <details class="code-fold">
 <summary>Code</summary>
 <div class="sourceCode cell-code" id="cb1"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(tidyverse)</span>
-<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(janitor)</span>
-<span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(lubridate)</span>
-<span id="cb1-4"><a href="#cb1-4" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(scales)</span>
-<span id="cb1-5"><a href="#cb1-5" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(GGally)</span>
-<span id="cb1-6"><a href="#cb1-6" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(ggalluvial)</span>
-<span id="cb1-7"><a href="#cb1-7" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb1-8"><a href="#cb1-8" aria-hidden="true" tabindex="-1"></a><span class="co"># Bigger, easy-to-read base font for all plots</span></span>
-<span id="cb1-9"><a href="#cb1-9" aria-hidden="true" tabindex="-1"></a><span class="fu">theme_set</span>(<span class="fu">theme_minimal</span>(<span class="at">base_size =</span> <span class="dv">14</span>))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(dplyr)</span>
+<span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(janitor)</span>
+<span id="cb1-4"><a href="#cb1-4" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(lubridate)</span>
+<span id="cb1-5"><a href="#cb1-5" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(scales)</span>
+<span id="cb1-6"><a href="#cb1-6" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(GGally)</span>
+<span id="cb1-7"><a href="#cb1-7" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(ggalluvial)</span>
+<span id="cb1-8"><a href="#cb1-8" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-9"><a href="#cb1-9" aria-hidden="true" tabindex="-1"></a><span class="co"># Bigger, easy-to-read base font for all plots</span></span>
+<span id="cb1-10"><a href="#cb1-10" aria-hidden="true" tabindex="-1"></a><span class="fu">theme_set</span>(<span class="fu">theme_minimal</span>(<span class="at">base_size =</span> <span class="dv">14</span>))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </details>
 </div>
 <div class="cell">
@@ -242,7 +257,11 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <span id="cb3-14"><a href="#cb3-14" aria-hidden="true" tabindex="-1"></a>  <span class="fu">filter</span>(<span class="sc">!</span><span class="fu">is.na</span>(status))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </details>
 </div>
-<p>Executive Summary: Across the dataset, most startups remain operating, while acquisition and closure outcomes are relatively rare and accumulate over time. Funding intensity and industry context are strongly associated with outcomes, with older cohorts and heavily funded startups more likely to experience exits. These patterns suggest that time, fundraising depth, and market segment jointly shape startup trajectories.</p>
+</section>
+<section id="exploratory-data-analysis" class="level2" data-number="3.2">
+<h2 data-number="3.2" class="anchored" data-anchor-id="exploratory-data-analysis"><span class="header-section-number">3.2</span> Exploratory Data Analysis</h2>
+<section id="initial-glance-at-startup-information" class="level3" data-number="3.2.1">
+<h3 data-number="3.2.1" class="anchored" data-anchor-id="initial-glance-at-startup-information"><span class="header-section-number">3.2.1</span> Initial Glance at Startup Information</h3>
 <div class="cell">
 <details class="code-fold">
 <summary>Code</summary>
@@ -285,7 +304,9 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 </div>
 </div>
 </div>
-<p>The sharp rise in startup foundings in the 2000s highlights a structural shift in entrepreneurial activity, though the apparent decline in the most recent years likely reflects data truncation rather than a true drop in formation.</p>
+<p>For most of the 20th century, the number of new startups remained extremely low and relatively flat, barely rising above a few dozen per year. A noticeable uptick begins in the late 1990s, coinciding with the growth of the internet and early tech boom.</p>
+<p>The most striking pattern appears in the mid-2000s to early 2010s: startup formation skyrockets from a few hundred per year to over 5,000 per year at its peak. This surge likely reflects the combination of expanding venture capital availability, the rise of cloud computing (which reduced startup costs), and broader cultural and economic support for entrepreneurship. The sharp drop immediately after the peak may indicate incomplete data for very recent years—startups founded later may not yet be fully captured in the dataset.</p>
+<p>Overall, the graph highlights that startup formation was historically rare but expanded explosively in the 2000s, marking a major shift in the scale and pace of entrepreneurial activity.</p>
 <div class="cell">
 <details class="code-fold">
 <summary>Code</summary>
@@ -336,35 +357,35 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 </div>
 </div>
 </div>
-<p>The dominance of software and biotechnology reflects both the scalability of digital products and strong investor interest in technology-driven sectors.</p>
+<p>This distribution reveals that Software dominates the startup landscape by a wide margin, with nearly 4,500 companies, which is far more than any other sector. Biotechnology follows as the second-largest market, though its total count still trails Software by a significant gap. These two categories stand out clearly as the major hubs of startup activity.</p>
+<p>Beyond the top two, markets such as Mobile, E-Commerce, and Curated Web form a second tier of sizable but considerably smaller sectors, each hosting roughly 1,000–1,500 startups. The remaining markets, such as Enterprise Software, Health Care, Clean Technology, Games, and Advertising, have progressively fewer startups but still represent meaningful areas of innovation and investment.</p>
+<p>Thus, we could tell that a few sectors (especially Software and Biotechnology) account for a disproportionately large share of companies, while many other markets are substantially smaller in scale. This distribution suggests that entrepreneurial activity tends to cluster in domains with either low barriers to entry (Software) or substantial scientific and commercial opportunity (Biotechnology).</p>
 <div class="cell">
 <details class="code-fold">
 <summary>Code</summary>
 <div class="sourceCode cell-code" id="cb6"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a>status_counts <span class="ot">&lt;-</span> startup <span class="sc">|&gt;</span> </span>
 <span id="cb6-2"><a href="#cb6-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">count</span>(status)</span>
 <span id="cb6-3"><a href="#cb6-3" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb6-4"><a href="#cb6-4" aria-hidden="true" tabindex="-1"></a>gg_status_counts <span class="ot">&lt;-</span> <span class="fu">ggplot</span>(</span>
+<span id="cb6-4"><a href="#cb6-4" aria-hidden="true" tabindex="-1"></a>gg_status_pie <span class="ot">&lt;-</span> <span class="fu">ggplot</span>(</span>
 <span id="cb6-5"><a href="#cb6-5" aria-hidden="true" tabindex="-1"></a>  status_counts,</span>
-<span id="cb6-6"><a href="#cb6-6" aria-hidden="true" tabindex="-1"></a>  <span class="fu">aes</span>(<span class="at">x =</span> status, <span class="at">y =</span> n, <span class="at">fill =</span> status)</span>
+<span id="cb6-6"><a href="#cb6-6" aria-hidden="true" tabindex="-1"></a>  <span class="fu">aes</span>(<span class="at">x =</span> <span class="st">""</span>, <span class="at">y =</span> n, <span class="at">fill =</span> status)</span>
 <span id="cb6-7"><a href="#cb6-7" aria-hidden="true" tabindex="-1"></a>) <span class="sc">+</span></span>
-<span id="cb6-8"><a href="#cb6-8" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_col</span>() <span class="sc">+</span></span>
-<span id="cb6-9"><a href="#cb6-9" aria-hidden="true" tabindex="-1"></a>  <span class="fu">scale_fill_manual</span>(<span class="at">values =</span> status_palette) <span class="sc">+</span></span>
-<span id="cb6-10"><a href="#cb6-10" aria-hidden="true" tabindex="-1"></a>  <span class="fu">scale_y_continuous</span>(</span>
-<span id="cb6-11"><a href="#cb6-11" aria-hidden="true" tabindex="-1"></a>    <span class="at">labels =</span> <span class="fu">label_number</span>(<span class="at">scale_cut =</span> <span class="fu">cut_si</span>(<span class="st">""</span>), <span class="at">accuracy =</span> <span class="dv">1</span>)</span>
-<span id="cb6-12"><a href="#cb6-12" aria-hidden="true" tabindex="-1"></a>  ) <span class="sc">+</span></span>
-<span id="cb6-13"><a href="#cb6-13" aria-hidden="true" tabindex="-1"></a>  <span class="fu">labs</span>(</span>
-<span id="cb6-14"><a href="#cb6-14" aria-hidden="true" tabindex="-1"></a>    <span class="at">title    =</span> <span class="st">"Most Startups in the Sample Are Still Operating"</span>,</span>
-<span id="cb6-15"><a href="#cb6-15" aria-hidden="true" tabindex="-1"></a>    <span class="at">subtitle =</span> <span class="st">"Count of startups by current Crunchbase status"</span>,</span>
-<span id="cb6-16"><a href="#cb6-16" aria-hidden="true" tabindex="-1"></a>    <span class="at">x =</span> <span class="cn">NULL</span>,</span>
-<span id="cb6-17"><a href="#cb6-17" aria-hidden="true" tabindex="-1"></a>    <span class="at">y =</span> <span class="st">"Number of startups"</span></span>
-<span id="cb6-18"><a href="#cb6-18" aria-hidden="true" tabindex="-1"></a>  ) <span class="sc">+</span></span>
-<span id="cb6-19"><a href="#cb6-19" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme</span>(</span>
-<span id="cb6-20"><a href="#cb6-20" aria-hidden="true" tabindex="-1"></a>    <span class="at">plot.title   =</span> <span class="fu">element_text</span>(<span class="at">face =</span> <span class="st">"bold"</span>, <span class="at">size =</span> <span class="dv">15</span>),</span>
-<span id="cb6-21"><a href="#cb6-21" aria-hidden="true" tabindex="-1"></a>    <span class="at">plot.subtitle=</span> <span class="fu">element_text</span>(<span class="at">size =</span> <span class="dv">12</span>),</span>
-<span id="cb6-22"><a href="#cb6-22" aria-hidden="true" tabindex="-1"></a>    <span class="at">legend.position =</span> <span class="st">"none"</span>   <span class="co"># optional but clean here</span></span>
-<span id="cb6-23"><a href="#cb6-23" aria-hidden="true" tabindex="-1"></a>  )</span>
-<span id="cb6-24"><a href="#cb6-24" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb6-25"><a href="#cb6-25" aria-hidden="true" tabindex="-1"></a>gg_status_counts</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<span id="cb6-8"><a href="#cb6-8" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_col</span>(<span class="at">width =</span> <span class="dv">1</span>, <span class="at">color =</span> <span class="st">"white"</span>) <span class="sc">+</span></span>
+<span id="cb6-9"><a href="#cb6-9" aria-hidden="true" tabindex="-1"></a>  <span class="fu">coord_polar</span>(<span class="at">theta =</span> <span class="st">"y"</span>) <span class="sc">+</span></span>
+<span id="cb6-10"><a href="#cb6-10" aria-hidden="true" tabindex="-1"></a>  <span class="fu">scale_fill_manual</span>(<span class="at">values =</span> status_palette) <span class="sc">+</span></span>
+<span id="cb6-11"><a href="#cb6-11" aria-hidden="true" tabindex="-1"></a>  <span class="fu">labs</span>(</span>
+<span id="cb6-12"><a href="#cb6-12" aria-hidden="true" tabindex="-1"></a>    <span class="at">title    =</span> <span class="st">"Most Startups in the Sample Are Still Operating"</span>,</span>
+<span id="cb6-13"><a href="#cb6-13" aria-hidden="true" tabindex="-1"></a>    <span class="at">subtitle =</span> <span class="st">"Distribution of startups by current Crunchbase status"</span>,</span>
+<span id="cb6-14"><a href="#cb6-14" aria-hidden="true" tabindex="-1"></a>    <span class="at">fill =</span> <span class="st">"Status"</span></span>
+<span id="cb6-15"><a href="#cb6-15" aria-hidden="true" tabindex="-1"></a>  ) <span class="sc">+</span></span>
+<span id="cb6-16"><a href="#cb6-16" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme_void</span>() <span class="sc">+</span></span>
+<span id="cb6-17"><a href="#cb6-17" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme</span>(</span>
+<span id="cb6-18"><a href="#cb6-18" aria-hidden="true" tabindex="-1"></a>    <span class="at">plot.title    =</span> <span class="fu">element_text</span>(<span class="at">face =</span> <span class="st">"bold"</span>, <span class="at">size =</span> <span class="dv">15</span>),</span>
+<span id="cb6-19"><a href="#cb6-19" aria-hidden="true" tabindex="-1"></a>    <span class="at">plot.subtitle =</span> <span class="fu">element_text</span>(<span class="at">size =</span> <span class="dv">12</span>),</span>
+<span id="cb6-20"><a href="#cb6-20" aria-hidden="true" tabindex="-1"></a>    <span class="at">legend.position =</span> <span class="st">"right"</span></span>
+<span id="cb6-21"><a href="#cb6-21" aria-hidden="true" tabindex="-1"></a>  )</span>
+<span id="cb6-22"><a href="#cb6-22" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-23"><a href="#cb6-23" aria-hidden="true" tabindex="-1"></a>gg_status_pie</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </details>
 <div class="cell-output-display">
 <div>
@@ -374,7 +395,10 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 </div>
 </div>
 </div>
-<p>Operating startups dominate the dataset, reflecting both the prevalence of ongoing firms and the fact that many startups have not yet reached an exit outcome.</p>
+<p>Operating startups dominate the data, reflecting both the prevalence of ongoing firms and the fact that many startups have not yet reached an exit outcome.</p>
+</section>
+<section id="status-focus-investigation" class="level3" data-number="3.2.2">
+<h3 data-number="3.2.2" class="anchored" data-anchor-id="status-focus-investigation"><span class="header-section-number">3.2.2</span> Status-Focus Investigation</h3>
 <div class="cell">
 <details class="code-fold">
 <summary>Code</summary>
@@ -419,7 +443,8 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 </div>
 </div>
 </div>
-<p>Startup founding activity differs sharply across outcomes and over time. Acquired startups are heavily concentrated in earlier founding years, reflecting the long time horizons required for exits or failure to materialize. In contrast, operating startups are overwhelmingly founded in more recent years, driven by the rapid expansion of entrepreneurial activity in the late 1990s and 2000s. This divergence highlights a key survivorship dynamic in startup data: many newer firms are still classified as operating not because they are more successful, but because they have not yet had sufficient time to exit. Together, these panels emphasize the importance of accounting for cohort effects when comparing startup outcomes.</p>
+<p>Startup founding activity differs across outcomes and over time. Acquired startups are heavily concentrated in earlier founding years, reflecting the long time horizons required for exits or failure to materialize. In contrast, operating startups are overwhelmingly founded in more recent years, driven by the rapid expansion of entrepreneurial activity in the late 1990s and 2000s.</p>
+<p>This divergence highlights a key survivorship bias (https://corporatefinanceinstitute.com/resources/career-map/sell-side/capital-markets/survivorship-bias/) in startup data: many newer firms are still classified as operating not because they are more successful, but because they have not yet had sufficient time to exit. Together, these panels emphasize the importance of accounting for cohort effects when comparing startup outcomes.</p>
 <div class="cell">
 <details class="code-fold">
 <summary>Code</summary>
@@ -440,7 +465,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <span id="cb8-15"><a href="#cb8-15" aria-hidden="true" tabindex="-1"></a>    <span class="at">breaks =</span> <span class="fu">c</span>(<span class="fl">1e5</span>, <span class="fl">1e6</span>, <span class="fl">1e7</span>, <span class="fl">1e8</span>, <span class="fl">1e9</span>)</span>
 <span id="cb8-16"><a href="#cb8-16" aria-hidden="true" tabindex="-1"></a>  ) <span class="sc">+</span></span>
 <span id="cb8-17"><a href="#cb8-17" aria-hidden="true" tabindex="-1"></a>  <span class="fu">labs</span>(</span>
-<span id="cb8-18"><a href="#cb8-18" aria-hidden="true" tabindex="-1"></a>    <span class="at">title    =</span> <span class="st">"Acquired Startups Tend to Raise More Money"</span>,</span>
+<span id="cb8-18"><a href="#cb8-18" aria-hidden="true" tabindex="-1"></a>    <span class="at">title    =</span> <span class="st">"Acquired Startups Tend to Raise More Money In General"</span>,</span>
 <span id="cb8-19"><a href="#cb8-19" aria-hidden="true" tabindex="-1"></a>    <span class="at">subtitle =</span> <span class="st">"Distribution of total funding by status (log scale)"</span>,</span>
 <span id="cb8-20"><a href="#cb8-20" aria-hidden="true" tabindex="-1"></a>    <span class="at">x =</span> <span class="cn">NULL</span>,</span>
 <span id="cb8-21"><a href="#cb8-21" aria-hidden="true" tabindex="-1"></a>    <span class="at">y =</span> <span class="st">"Total funding (USD, log scale)"</span></span>
@@ -461,7 +486,10 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 </div>
 </div>
 </div>
-<p>Acquired startups tend to raise substantially more total funding than closed firms, while operating startups fall in between, with all three groups exhibiting wide variation in funding levels.</p>
+<p>Acquired startups exhibit substantially higher total funding than both closed and still-operating firms, with their median investment level above the other groups. This pattern suggests that larger capital inflows may increase the likelihood of a successful exit: alternatively, that investors concentrate funding in ventures already demonstrating strong traction.</p>
+<p>Closed startups, by contrast, show the lowest funding levels, with a compressed distribution and few high-end outliers. This aligns with the possibility that under-capitalized startups struggle to achieve long-term sustainability or reach attractive exit opportunities.</p>
+<p>Operating startups fall between the two outcomes. On average, they raise more capital than closed firms but remain below the funding levels typical of acquired companies. At the same time, the distribution for operating startups spans a wide range: some achieve exceptionally high funding (sometimes even exceeding that of acquired firms), while a small subset receives very little, falling below the levels seen in many closed firms. This indicates that the “operating” category contains both high-growth winners still scaling and lower-capitalized companies that have yet to reach an inflection point.</p>
+<p>Across all groups, the broad dispersion of funding, especially on a logarithmic scale, highlights the highly skewed, power-law nature of venture investment, where a small number of firms capture a disproportionately large share of total capital.</p>
 <div class="cell">
 <details class="code-fold">
 <summary>Code</summary>
@@ -508,33 +536,49 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 </div>
 </div>
 </div>
-<p>Across nearly all major markets, the majority of startups remain operating, reflecting both the long time horizons required for exits and the concentration of younger firms that have not yet reached acquisition or closure.</p>
+<p>Across nearly all major markets, operating startups make up the overwhelming majority, highlighting a key structural feature of the startup ecosystem: most firms remain in the active, growth-seeking phase for long periods before reaching an exit event. This dominance of operating firms reflects long exit horizons, especially in sectors like education, health and wellness, biotechnology, where scaling takes time and market consolidation is slower. Yet the distribution of acquired and closed startups varies meaningfully across markets, revealing differences in exit dynamics and market maturity.</p>
+<p>Markets such as advertising, curated web, and enterprise software show relatively higher acquisition shares, suggesting more active M&amp;A pipelines and stronger integration opportunities with established incumbents. Meanwhile, closure rates, while generally modest, are most pronounced in markets such as games, social media, and curated web, where consumer preferences shift rapidly and competition is especially intense, leading to higher churn.</p>
 <div class="cell">
 <details class="code-fold">
 <summary>Code</summary>
-<div class="sourceCode cell-code" id="cb10"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb10-1"><a href="#cb10-1" aria-hidden="true" tabindex="-1"></a>gg_founded_status <span class="ot">&lt;-</span> startup <span class="sc">|&gt;</span></span>
-<span id="cb10-2"><a href="#cb10-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">filter</span>(<span class="sc">!</span><span class="fu">is.na</span>(founded_year)) <span class="sc">|&gt;</span></span>
-<span id="cb10-3"><a href="#cb10-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">count</span>(founded_year, status) <span class="sc">|&gt;</span></span>
-<span id="cb10-4"><a href="#cb10-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">group_by</span>(founded_year) <span class="sc">|&gt;</span></span>
-<span id="cb10-5"><a href="#cb10-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">prop =</span> n <span class="sc">/</span> <span class="fu">sum</span>(n)) <span class="sc">|&gt;</span></span>
-<span id="cb10-6"><a href="#cb10-6" aria-hidden="true" tabindex="-1"></a>  <span class="fu">ggplot</span>(<span class="fu">aes</span>(<span class="at">x =</span> founded_year, <span class="at">y =</span> prop, <span class="at">fill =</span> status)) <span class="sc">+</span></span>
-<span id="cb10-7"><a href="#cb10-7" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_area</span>(<span class="at">alpha =</span> <span class="fl">0.85</span>, <span class="at">color =</span> <span class="st">"white"</span>, <span class="at">linewidth =</span> <span class="fl">0.2</span>) <span class="sc">+</span></span>
-<span id="cb10-8"><a href="#cb10-8" aria-hidden="true" tabindex="-1"></a>  <span class="fu">scale_fill_manual</span>(<span class="at">values =</span> status_palette) <span class="sc">+</span></span>
-<span id="cb10-9"><a href="#cb10-9" aria-hidden="true" tabindex="-1"></a>  <span class="fu">scale_y_continuous</span>(<span class="at">labels =</span> <span class="fu">label_percent</span>(<span class="at">accuracy =</span> <span class="dv">1</span>)) <span class="sc">+</span></span>
-<span id="cb10-10"><a href="#cb10-10" aria-hidden="true" tabindex="-1"></a>  <span class="fu">labs</span>(</span>
-<span id="cb10-11"><a href="#cb10-11" aria-hidden="true" tabindex="-1"></a>    <span class="at">title    =</span> <span class="st">"Older Cohorts Have Had More Time to Be Acquired or Close"</span>,</span>
-<span id="cb10-12"><a href="#cb10-12" aria-hidden="true" tabindex="-1"></a>    <span class="at">subtitle =</span> <span class="st">"Share of startups with each outcome by founding year"</span>,</span>
-<span id="cb10-13"><a href="#cb10-13" aria-hidden="true" tabindex="-1"></a>    <span class="at">x =</span> <span class="st">"Year founded"</span>,</span>
-<span id="cb10-14"><a href="#cb10-14" aria-hidden="true" tabindex="-1"></a>    <span class="at">y =</span> <span class="st">"Share of startups"</span></span>
-<span id="cb10-15"><a href="#cb10-15" aria-hidden="true" tabindex="-1"></a>  ) <span class="sc">+</span></span>
-<span id="cb10-16"><a href="#cb10-16" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme</span>(</span>
-<span id="cb10-17"><a href="#cb10-17" aria-hidden="true" tabindex="-1"></a>    <span class="at">plot.title    =</span> <span class="fu">element_text</span>(<span class="at">face =</span> <span class="st">"bold"</span>, <span class="at">size =</span> <span class="dv">15</span>),</span>
-<span id="cb10-18"><a href="#cb10-18" aria-hidden="true" tabindex="-1"></a>    <span class="at">plot.subtitle =</span> <span class="fu">element_text</span>(<span class="at">size =</span> <span class="dv">12</span>),</span>
-<span id="cb10-19"><a href="#cb10-19" aria-hidden="true" tabindex="-1"></a>    <span class="at">legend.title  =</span> <span class="fu">element_blank</span>(),</span>
-<span id="cb10-20"><a href="#cb10-20" aria-hidden="true" tabindex="-1"></a>    <span class="at">legend.position =</span> <span class="st">"bottom"</span></span>
-<span id="cb10-21"><a href="#cb10-21" aria-hidden="true" tabindex="-1"></a>  )</span>
-<span id="cb10-22"><a href="#cb10-22" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb10-23"><a href="#cb10-23" aria-hidden="true" tabindex="-1"></a>gg_founded_status</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb10"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb10-1"><a href="#cb10-1" aria-hidden="true" tabindex="-1"></a>status_levels <span class="ot">&lt;-</span> <span class="fu">c</span>(<span class="st">"acquired"</span>, <span class="st">"closed"</span>, <span class="st">"operating"</span>)</span>
+<span id="cb10-2"><a href="#cb10-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb10-3"><a href="#cb10-3" aria-hidden="true" tabindex="-1"></a>founded_status <span class="ot">&lt;-</span> startup <span class="sc">|&gt;</span></span>
+<span id="cb10-4"><a href="#cb10-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">filter</span>(<span class="sc">!</span><span class="fu">is.na</span>(founded_year)) <span class="sc">|&gt;</span></span>
+<span id="cb10-5"><a href="#cb10-5" aria-hidden="true" tabindex="-1"></a>  <span class="co"># make sure status is a factor with the three levels we expect</span></span>
+<span id="cb10-6"><a href="#cb10-6" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">status =</span> <span class="fu">factor</span>(status, <span class="at">levels =</span> status_levels)) <span class="sc">|&gt;</span></span>
+<span id="cb10-7"><a href="#cb10-7" aria-hidden="true" tabindex="-1"></a>  <span class="fu">count</span>(founded_year, status) <span class="sc">|&gt;</span></span>
+<span id="cb10-8"><a href="#cb10-8" aria-hidden="true" tabindex="-1"></a>  <span class="co"># ensure we have a row for every year × status, fill missing with 0</span></span>
+<span id="cb10-9"><a href="#cb10-9" aria-hidden="true" tabindex="-1"></a>  <span class="fu">complete</span>(founded_year, status, <span class="at">fill =</span> <span class="fu">list</span>(<span class="at">n =</span> <span class="dv">0</span>)) <span class="sc">|&gt;</span></span>
+<span id="cb10-10"><a href="#cb10-10" aria-hidden="true" tabindex="-1"></a>  <span class="fu">group_by</span>(founded_year) <span class="sc">|&gt;</span></span>
+<span id="cb10-11"><a href="#cb10-11" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">prop =</span> n <span class="sc">/</span> <span class="fu">sum</span>(n)) <span class="sc">|&gt;</span></span>
+<span id="cb10-12"><a href="#cb10-12" aria-hidden="true" tabindex="-1"></a>  <span class="fu">ungroup</span>()</span>
+<span id="cb10-13"><a href="#cb10-13" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb10-14"><a href="#cb10-14" aria-hidden="true" tabindex="-1"></a>gg_founded_status <span class="ot">&lt;-</span> <span class="fu">ggplot</span>(</span>
+<span id="cb10-15"><a href="#cb10-15" aria-hidden="true" tabindex="-1"></a>  founded_status,</span>
+<span id="cb10-16"><a href="#cb10-16" aria-hidden="true" tabindex="-1"></a>  <span class="fu">aes</span>(<span class="at">x =</span> founded_year, <span class="at">y =</span> prop, <span class="at">fill =</span> status)</span>
+<span id="cb10-17"><a href="#cb10-17" aria-hidden="true" tabindex="-1"></a>) <span class="sc">+</span></span>
+<span id="cb10-18"><a href="#cb10-18" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_area</span>(<span class="at">alpha =</span> <span class="fl">0.85</span>, <span class="at">color =</span> <span class="st">"white"</span>, <span class="at">linewidth =</span> <span class="fl">0.2</span>) <span class="sc">+</span></span>
+<span id="cb10-19"><a href="#cb10-19" aria-hidden="true" tabindex="-1"></a>  <span class="fu">scale_fill_manual</span>(<span class="at">values =</span> status_palette) <span class="sc">+</span></span>
+<span id="cb10-20"><a href="#cb10-20" aria-hidden="true" tabindex="-1"></a>  <span class="fu">scale_y_continuous</span>(</span>
+<span id="cb10-21"><a href="#cb10-21" aria-hidden="true" tabindex="-1"></a>    <span class="at">labels =</span> <span class="fu">label_percent</span>(<span class="at">accuracy =</span> <span class="dv">1</span>),</span>
+<span id="cb10-22"><a href="#cb10-22" aria-hidden="true" tabindex="-1"></a>    <span class="at">limits =</span> <span class="fu">c</span>(<span class="dv">0</span>, <span class="dv">1</span>),</span>
+<span id="cb10-23"><a href="#cb10-23" aria-hidden="true" tabindex="-1"></a>    <span class="at">expand =</span> <span class="fu">expansion</span>(<span class="at">mult =</span> <span class="dv">0</span>)</span>
+<span id="cb10-24"><a href="#cb10-24" aria-hidden="true" tabindex="-1"></a>  ) <span class="sc">+</span></span>
+<span id="cb10-25"><a href="#cb10-25" aria-hidden="true" tabindex="-1"></a>  <span class="fu">labs</span>(</span>
+<span id="cb10-26"><a href="#cb10-26" aria-hidden="true" tabindex="-1"></a>    <span class="at">title    =</span> <span class="st">"Younger Cohorts Have Larger Chance to Be Acquired or Close"</span>,</span>
+<span id="cb10-27"><a href="#cb10-27" aria-hidden="true" tabindex="-1"></a>    <span class="at">subtitle =</span> <span class="st">"Share of startups with each outcome by founding year"</span>,</span>
+<span id="cb10-28"><a href="#cb10-28" aria-hidden="true" tabindex="-1"></a>    <span class="at">x =</span> <span class="st">"Year founded"</span>,</span>
+<span id="cb10-29"><a href="#cb10-29" aria-hidden="true" tabindex="-1"></a>    <span class="at">y =</span> <span class="st">"Share of startups"</span></span>
+<span id="cb10-30"><a href="#cb10-30" aria-hidden="true" tabindex="-1"></a>  ) <span class="sc">+</span></span>
+<span id="cb10-31"><a href="#cb10-31" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme</span>(</span>
+<span id="cb10-32"><a href="#cb10-32" aria-hidden="true" tabindex="-1"></a>    <span class="at">plot.title    =</span> <span class="fu">element_text</span>(<span class="at">face =</span> <span class="st">"bold"</span>, <span class="at">size =</span> <span class="dv">15</span>),</span>
+<span id="cb10-33"><a href="#cb10-33" aria-hidden="true" tabindex="-1"></a>    <span class="at">plot.subtitle =</span> <span class="fu">element_text</span>(<span class="at">size =</span> <span class="dv">12</span>),</span>
+<span id="cb10-34"><a href="#cb10-34" aria-hidden="true" tabindex="-1"></a>    <span class="at">legend.title  =</span> <span class="fu">element_blank</span>(),</span>
+<span id="cb10-35"><a href="#cb10-35" aria-hidden="true" tabindex="-1"></a>    <span class="at">legend.position =</span> <span class="st">"bottom"</span></span>
+<span id="cb10-36"><a href="#cb10-36" aria-hidden="true" tabindex="-1"></a>  )</span>
+<span id="cb10-37"><a href="#cb10-37" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb10-38"><a href="#cb10-38" aria-hidden="true" tabindex="-1"></a>gg_founded_status</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </details>
 <div class="cell-output-display">
 <div>
@@ -544,7 +588,9 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 </div>
 </div>
 </div>
-<p>Older startup cohorts show higher acquisition and closure rates because they’ve had more time to progress toward an outcome, whereas most recently founded companies remain in operation by default.</p>
+<p>For the earliest cohorts, roughly from the early 1900s through the 1960s, the large swings in the chart are not meaningful indicators of true trends. Instead, they reflect extremely small sample sizes, sometimes with only one startup founded in a given year. As a result, the proportions jump sharply between 0% and 100%, making these early patterns unreliable for interpretation.</p>
+<p>Beginning around the 1970s, the data becomes dense enough to reveal more stable and interpretable trends. Across these later decades, operating startups consistently make up the largest share within each founding cohort. The share of closed startups gradually increases for more recent cohorts, while the share of acquired startups peaks among those founded in the late 1990s and early 2000s, a period marked by the rise of the internet era and substantial consolidation in the tech sector. This widening of the green band indicates that acquisitions were relatively more common for startups founded during this time.</p>
+<p>For startups founded after roughly 2000, the closed share becomes more prominent.This suggests that among the firms with known outcomes, closure becomes increasingly common in more recent years. Finally, for the most recent cohorts, particularly those founded after 2010, the chart shows an overwhelming share classified as “operating.” This should not be interpreted as greater success; rather, these startups are simply too young to have reached an exit event, resulting in a near-100% operating classification by default.</p>
 <div class="cell">
 <details class="code-fold">
 <summary>Code</summary>
@@ -587,7 +633,10 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 </div>
 </div>
 </div>
-<p>Although most startups remain active across all markets, the balance between successful exits and failures differs notably by industry, reflecting differences in business models, capital needs, and acquisition demand.</p>
+<p>Across all five markets, operating startups make up the largest share, indicating that most startups in these sectors have not yet reached a definitive exit event. However, the relative shares of acquired and closed startups vary meaningfully by market.</p>
+<p>Biotechnology, E-Commerce, Mobile, and Software all show a similar pattern: a modest share of acquisitions at the top, a relatively small proportion of closures in the middle, and a dominant base of operating firms. These industries tend to have long development cycles (Biotech), high growth potential (Mobile, Software), and frequent acquisition activity (Software, E-Commerce), which may help explain the moderate levels of successful exits.</p>
+<p>Curated Web, however, stands out obviosuly. It has a much higher proportion of closed startups compared to the other markets, indicating greater volatility or lower long-term sustainability in this category. The smaller operating share suggests that many firms in this niche fail to survive long enough to be acquired or to continue operating.</p>
+<p>In the end, this mosaic plot highlights that while most startups remain active across markets, the risk of failure is much higher in the Curated Web space, but industries like Software, Mobile, and Biotechnology exhibit stronger operating persistence and relatively greater acquisition activity.</p>
 <div class="cell">
 <details class="code-fold">
 <summary>Code</summary>
@@ -683,7 +732,8 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 </div>
 </div>
 </div>
-<p>This alluvial plot highlights how founding cohorts, funding intensity, and final startup outcomes are closely intertwined. Startups founded in earlier periods are more likely to progress beyond a single funding round and ultimately reach an acquisition or closure, while more recent cohorts overwhelmingly remain operating, reflecting limited time for exits to occur. Across cohorts, startups with only one funding round are much more likely to remain operating or close, whereas those that raise multiple rounds are disproportionately represented among acquisitions. Overall, the figure suggests that funding intensity acts as a key intermediate pathway linking founding period to eventual outcomes, with greater access to capital associated with higher chances of successful exits.</p>
+<p>This alluvial plot illustrates how startups transition from their founding period to different levels of funding intensity and ultimately to their final outcomes. The more recent cohorts, particularly those founded between 2009 and 2011, form the thickest streams, indicating that startup formation accelerated significantly in the post-2008 tech boom. Across all cohorts, the majority of startups receive only a single funding round, and only a small fraction progress to two or three rounds, with an even smaller group reaching four or more rounds. This pattern reflects the steep funnel of venture funding: many companies raise initial capital, but relatively few sustain investor support through later stages.</p>
+<p>The funding pathways are strongly correlated with outcomes. Startups receiving only one round tend to remain operating but also make up a large share of closures, suggesting that many early-stage firms struggle to maintain momentum. Those with two or three rounds exhibit a more balanced distribution across operating, acquired, and closed outcomes, indicating that this middle group is competitive enough to move toward some form of exit—positive or negative. The highest funding category, four or more rounds, shows the strongest flow toward acquisitions (no closure records), highlighting that sustained funding is a strong marker of eventual acquisition potential. Closures appear across all funding levels but are concentrated among companies with one or two rounds. Despite these differences, the operating category remains the plurality across all groups, particularly for the most recent cohorts whose outcomes may still be unfolding.</p>
 <div class="cell">
 <details class="code-fold">
 <summary>Code</summary>
@@ -746,9 +796,15 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 </div>
 </div>
 </div>
-<p>Across all startup outcomes, total funding rises systematically with the number of funding rounds, indicating that companies able to raise repeatedly tend to secure substantially larger cumulative investments. This pattern is especially pronounced for acquired startups, which show both higher medians and upper tails as funding rounds increase, consistent with investors doubling down on firms perceived as successful. Closed startups also exhibit increasing funding with additional rounds, suggesting that raising more capital does not guarantee survival. Among operating startups, the wide spread of funding at higher round counts reflects ongoing uncertainty: while some firms continue to scale rapidly, others accumulate moderate funding without yet reaching a clear exit.</p>
+<p>Across all three outcome categories, the same core pattern appears: startups that raise more rounds tend to receive substantially larger total investments.</p>
+<p>For acquired startups, funding increases consistently as firms progress from one round to 2–3 rounds to 4+ rounds. Acquired firms with 4+ rounds have the highest median funding levels in the entire chart, suggesting that sustained investment is strongly associated with eventual acquisition—likely reflecting investor confidence, growth potential, or strategic value.</p>
+<p>Among closed startups, a similar but less pronounced pattern emerges. Startups that ultimately fail still show higher funding levels when they raise more rounds, indicating that even firms that eventually shut down may attract significant capital before their failure becomes evident. However, their distributions remain below those of acquired firms, reinforcing that higher funding alone does not guarantee success.</p>
+<p>For operating startups, total funding also increases with additional rounds, and their median funding levels for 2–3 and 4+ rounds approach those of acquired firms. This suggests that many actively operating firms remain well-capitalized and could still be on a trajectory toward future exits.</p>
+<p>Lastly, we could tell that more funding rounds correspond to much larger total funding amounts, regardless of a startup’s eventual outcome. What differs by outcome is the typical funding level: acquired firms tend to sit at the top of the funding distribution, while closed firms occupy the lower end, with operating firms in between. This pattern reflects both the selection effects of venture capital and the financial trajectories associated with different startup futures.</p>
 
 
+</section>
+</section>
 
 </main> <!-- /main -->
 <script id="quarto-html-after-body" type="application/javascript">
@@ -1170,7 +1226,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
     </div>   
     <div class="nav-footer-center">
       &nbsp;
-    <div class="toc-actions"><ul><li><a href="https://github.com/rf2960/Investments.git/edit/main/results.qmd" class="toc-action"><i class="bi bi-github"></i>Edit this page</a></li><li><a href="https://github.com/rf2960/Investments.git/issues/new" class="toc-action"><i class="bi empty"></i>Report an issue</a></li></ul></div></div>
+    <div class="toc-actions d-sm-block d-md-none"><ul><li><a href="https://github.com/rf2960/Investments.git/edit/main/results.qmd" class="toc-action"><i class="bi bi-github"></i>Edit this page</a></li><li><a href="https://github.com/rf2960/Investments.git/issues/new" class="toc-action"><i class="bi empty"></i>Report an issue</a></li></ul></div></div>
     <div class="nav-footer-right">
 <p>This book was built with <a href="https://quarto.org/">Quarto</a>.</p>
 </div>
