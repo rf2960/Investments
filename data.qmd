@@ -1,7 +1,7 @@
 # Data
 
 ## Description
-The dataset used in this project is the Startup Investments dataset documented by Crunchbase, publicly available on Github (https://raw.githubusercontent.com/notpeter/crunchbase-data/master/investments.csv), containing venture-backed startup information originally compiled from the Crunchbase platform and redistributed through an open data repository. The dataset represents a snapshot rather than a continuously updated feed and includes firm-level records collected by Crunchbase through self-reporting by companies, investor disclosures, and public announcements. The CSV file contains approximately 50,000 startups and 40 variables, including founding year, market category, geographic location, funding totals, number of funding rounds, and final company status (e.g., operating, acquired, closed, IPO). Each row corresponds to a single startup, with funding information aggregated across its lifetime rather than reported at a transactional level. Because the data are a static snapshot, they do not reflect real-time updates, and younger companies are more likely to appear as “operating,” introducing survivorship and censoring effects. Additional data quality issues include missing values in founding dates and funding fields, inconsistent market labels, and the absence of small or unreported startups that never appear in venture databases.
+The dataset used in this project is the Startup Investments dataset documented by Crunchbase, publicly available on Github (https://raw.githubusercontent.com/notpeter/crunchbase-data/master/investments.csv), containing venture-backed startup information originally compiled from the Crunchbase platform and redistributed through an open data repository. The dataset represents a snapshot rather than a continuously updated feed and includes firm-level records collected by Crunchbase through self-reporting by companies, investor disclosures, and public announcements. The CSV file contains approximately 50,000 startups and 40 variables, including founding year, market category, geographic location, funding totals, number of funding rounds, and final company status (e.g., operating, acquired, closed). Each row corresponds to a single startup, with funding information aggregated across its lifetime rather than reported at a transactional level. Because the data are a static snapshot, they do not reflect real-time updates, and younger companies are more likely to appear as “operating,” introducing survivorship and censoring effects. Additional data quality issues include missing values in founding dates and funding fields, inconsistent market labels, and the absence of small or unreported startups that never appear in venture databases.
 
 ## Missing value analysis
 
@@ -18,7 +18,8 @@ startup_raw <- read_csv(
 startup <- startup_raw |>
   clean_names() |>                        # makes names snake_case, trims spaces
   select(-starts_with("unnamed_")) |>     # drop completely empty columns
-  distinct()                               # remove exact duplicates if any
+  distinct()  |>                          # remove exact duplicates if any
+  filter(!is.na(status))
 
 glimpse(startup)
 ```
@@ -27,8 +28,7 @@ glimpse(startup)
 status_palette <- c(
   operating = "#4C72B0",
   acquired  = "#55A868",
-  closed    = "#C44E52",
-  ipo       = "#8172B2"
+  closed    = "#C44E52"
 )
 ```
 
@@ -54,10 +54,10 @@ gg_miss_fct(startup, fct = status) +
     legend.position = "right"
   )
 ```
+The figure above summarizes the total number of missing entries across all variables by startup status, showing a consistent missing data pattern. 
 
-The figure above summarizes the total number of missing entries across all variables by startup status, showing that operating startups account for the largest volume of missing data. 
+Two columns (x41 and x40) in the file are entirely missing, and we assume that it's caused by issues during data pipeline construction when raw data are pulled together. Location and founding information have substantial missingness (e.g., state_code, city, founded_year, founded_month, founded_quarter). Core variables for our analysis, including status, funding_total_usd, and name, are mostly observed, with only a small fraction of missing status (~2–3% of rows).
 
-Two columns (x41 and x40) in the raw file are entirely missing and are dropped. Location and founding information have substantial missingness (e.g., state_code, city, founded_year, founded_month, founded_quarter). Core variables for our analysis, including status, funding_total_usd, and name, are mostly observed, with only a small fraction of missing status (~2–3% of rows).
 
 ```{r}
 founded_missing_by_status <- startup |>
